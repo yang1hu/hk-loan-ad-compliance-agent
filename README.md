@@ -45,7 +45,25 @@
     └── README.md
 ```
 
-## 快速使用
+## 系统：能跑起来的评审工具
+
+不只有 md 文档，还有一个可运行的系统，见 `system/README.md`：
+
+```bash
+# 网页版（推荐）
+python3 system/server.py        # 打开 http://localhost:8000
+# 命令行版
+python3 system/cli.py review --ocr-text-file system/tests/fixtures/rc-20261104-001-ocr.txt
+```
+
+网页版：上传广告图 + 粘贴转录文字 → 自动跑第 1 层确定性检查 +
+APR 反推 → 生成 RC 草稿报告 → 建档、留历史、人工签核，改完图追加到
+同一 case 重审。零依赖（只用 Python 标准库），不用 API key，不联网，
+原图和 case 数据只存在本机 `data/cases/`，不进 Git。
+自测：`python3 system/tests/test_system.py`（已验证与人工 RC-20261104-001 v1
+结论一致：不建议发布，风险高）。
+
+## 快速使用（只用规则和脚本）
 
 ```bash
 # 1. 确定性检查（需要先 OCR，见 src/deterministic_checks.py 的说明）

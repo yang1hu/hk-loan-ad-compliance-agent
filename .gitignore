@@ -6,3 +6,5 @@ __pycache__/
 *.jpg
 # 广告原图含客户资料，默认不入库；测试用图请放 tests/golden/ 并脱敏
 ads/
+# 系统运行数据（case 档案、原图）只存在本机
+data/
