@@ -41,6 +41,16 @@ def main():
     ok &= check(result["risk"] == "高", "风险：高")
     ok &= check("rebate_exceeds_principal" in result["flags"], "回赠 80,000 > 借款 50,000 高风险")
 
+    # 繁体转录与简体转录应得出同一结果（2026-11-06 误判回归：繁体曾只过 2/8）
+    trad_text = (ROOT / "system/tests/fixtures/rc-20261104-001-ocr-trad.txt").read_text(encoding="utf-8")
+    trad_result = core.review(trad_text)
+    trad_passed = {c["name"]: c["passed"] for c in trad_result["checks"]}
+    ok &= check(trad_passed == passed, "繁体转录检查结果与简体一致（5/8）")
+    ok &= check(trad_result["apr_check"]["available"]
+                and abs(trad_result["apr_check"]["implied_months"] - 64.1) < 0.5,
+                "繁体转录 APR 反推同样约 64.1 个月")
+    ok &= check(trad_result["suggested_verdict"] == "不建议发布", "繁体转录建议结论：不建议发布")
+
     # CLI 端到端：review → list → show → signoff
     case_id = "RC-TEST-20261106-001"
     r = subprocess.run([sys.executable, "system/cli.py", "review",

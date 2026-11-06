@@ -19,6 +19,25 @@ import re
 import sys
 
 
+# 繁简归一：香港广告多为繁体，转录常为繁体，但检查用的关键词是简体。
+# 若不先归一，繁体转录会把图上明明有的忠告、牌照、热线、APR 全误判成
+# “未找到”（2026-11-06 网页版已因此出过 1/8 的误判，见 RC-20261106-001）。
+# 只做字形归一，不改数字、符号和标点；原文本仍原样存入 case 供复核。
+_TRAD_TO_SIMP = str.maketrans({
+    "萬": "万", "實": "实", "際": "际", "貸": "贷", "額": "额",
+    "達": "达", "時": "时", "廣": "广", "終": "终", "請": "请",
+    "況": "况", "條": "条", "細": "细", "則": "则", "優": "优",
+    "錢": "钱", "還": "还", "債": "债", "號": "号", "碼": "码",
+    "詢": "询", "訴": "诉", "熱": "热", "線": "线", "畫": "画",
+    "麼": "么", "個": "个", "發": "发", "獲": "获",
+})
+
+
+def normalize_text(text: str) -> str:
+    """繁体 → 简体归一（仅覆盖贷款广告常见字），供检查与数字提取用。"""
+    return text.translate(_TRAD_TO_SIMP)
+
+
 WARNING_TEXT = "忠告：借钱梗要还，咪俾钱中介"
 WARNING_TEXT_ALT = "忠告: 借钱梗要还，咪俾钱中介"
 
@@ -31,6 +50,7 @@ def check(name, passed, detail=""):
 
 
 def run_checks(text: str):
+    text = normalize_text(text)
     CHECKS.clear()
     # 忠告
     has_warning = WARNING_TEXT in text or WARNING_TEXT_ALT in text

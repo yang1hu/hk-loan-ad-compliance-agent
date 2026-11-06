@@ -37,6 +37,7 @@ _apr = _load_module("hk_apr", SRC / "apr.py")
 
 def parse_numbers(text):
     """从 OCR 文本里提取评审用的数字；提不到就返回 None，不猜。"""
+    text = _dchecks.normalize_text(text)  # 繁体转录先归一，否则“借 5 萬 / 實際年利率”提不到数
     out = {"principal": None, "apr": None, "monthly": None, "rebate": None}
     m = re.search(r"借\s*(\d+(?:\.\d+)?)\s*万", text)
     if m:
@@ -90,7 +91,7 @@ def review(ocr_text, principal=None, apr=None, monthly=None):
     if nums["rebate"] is not None and nums["principal"] is not None \
             and nums["rebate"] > nums["principal"]:
         flags.append("rebate_exceeds_principal")
-    if "限时" in ocr_text and not any(c["name"] == "promo_date_present" and c["passed"] for c in checks):
+    if "限时" in _dchecks.normalize_text(ocr_text) and not any(c["name"] == "promo_date_present" and c["passed"] for c in checks):
         flags.append("promo_no_date")
     if not any(c["name"] == "apr_present" and c["passed"] for c in checks):
         flags.append("no_apr_info")
