@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+*.mp4
+*.png
+*.jpg
+# 广告原图含客户资料，默认不入库；测试用图请放 tests/golden/ 并脱敏
+ads/
